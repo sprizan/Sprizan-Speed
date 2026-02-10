@@ -1,70 +1,103 @@
+--// Services
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 
-local Players = game:GetService('Players')
-local RunService = game:GetService('RunService')
-local v4 = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-_G.StartVelocityMove = function(arg1, arg2, arg3)
-    RunService.Heartbeat:Connect(function(arg1, arg2, arg3)
-        local v2 = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-        local v3 = game.Players.LocalPlayer.Character.FindFirstChildOfClass(game.Players.LocalPlayer.Character, "Humanoid")
-        local calc_4 = (Vector3.new(v3.MoveDirection.X, 0, v3.MoveDirection.Z) * arg1)
-        local v5 = v2.Velocity.Lerp(v2.Velocity, Vector3.new(calc_4.X, v2.Velocity.Y, calc_4.Z), 0.45)
-        v2.Velocity = v5
-    end)
+--// Player
+local player = Players.LocalPlayer
+local speed = 50
+local enabled = false
+local connection
+
+--// GUI
+local gui = Instance.new("ScreenGui")
+gui.Name = "SprizanSpeedGui"
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+-- Button
+local button = Instance.new("TextButton")
+button.Size = UDim2.new(0, 150, 0, 50)
+button.Position = UDim2.new(0.05, 0, 0.8, 0)
+button.Text = "Enable Speed"
+button.Font = Enum.Font.GothamBold
+button.TextScaled = true
+button.TextColor3 = Color3.new(1,1,1)
+button.BackgroundColor3 = Color3.fromRGB(70,120,255)
+button.Parent = gui
+
+Instance.new("UICorner", button).CornerRadius = UDim.new(0,10)
+local stroke = Instance.new("UIStroke", button)
+stroke.Thickness = 2
+stroke.Color = Color3.fromRGB(120,170,255)
+
+-- TextBox
+local box = Instance.new("TextBox")
+box.Size = UDim2.new(0, 80, 0, 50)
+box.Position = UDim2.new(0.05, 160, 0.8, 0)
+box.PlaceholderText = "Speed"
+box.Text = tostring(speed)
+box.ClearTextOnFocus = false
+box.Font = Enum.Font.GothamBold
+box.TextScaled = true
+box.TextColor3 = Color3.new(1,1,1)
+box.BackgroundColor3 = Color3.fromRGB(20,20,20)
+box.Parent = gui
+
+Instance.new("UICorner", box).CornerRadius = UDim.new(0,10)
+local boxStroke = Instance.new("UIStroke", box)
+boxStroke.Thickness = 2
+boxStroke.Color = Color3.fromRGB(80,80,80)
+
+--// Speed Logic
+local function startSpeed()
+	if connection then connection:Disconnect() end
+	connection = RunService.Heartbeat:Connect(function()
+		local char = player.Character
+		if not char then return end
+
+		local hrp = char:FindFirstChild("HumanoidRootPart")
+		local hum = char:FindFirstChildOfClass("Humanoid")
+		if not hrp or not hum then return end
+
+		local dir = hum.MoveDirection
+		if dir.Magnitude > 0 then
+			hrp.AssemblyLinearVelocity =
+				Vector3.new(dir.X * speed, hrp.AssemblyLinearVelocity.Y, dir.Z * speed)
+		end
+	end)
 end
-_G.StopVelocityMove = function()
-    local v1 = conn_1:Disconnect()
+
+local function stopSpeed()
+	if connection then
+		connection:Disconnect()
+		connection = nil
+	end
 end
-local screengui_147 = Instance.new("ScreenGui")
-screengui_147.Name = "SprizanVelocityToggle"
-screengui_147.ResetOnSpawn = false
-screengui_147.Parent = v4
-local textbutton_849 = Instance.new("TextButton")
-textbutton_849.Size = UDim2.new(0, 130, 0, 50)
-textbutton_849.Position = UDim2.new(0.05, 0, 0.8, 0)
-textbutton_849.BackgroundColor3 = Color3.fromRGB(70, 120, 255)
-textbutton_849.Text = "Enable Move"
-textbutton_849.Font = Font.GothamBold
-textbutton_849.TextColor3 = Color3.fromRGB(255, 255, 255)
-textbutton_849.TextScaled = true
-textbutton_849.AutoButtonColor = false
-textbutton_849.Parent = screengui_147
-local uicorner_756 = Instance.new("UICorner")
-uicorner_756.CornerRadius = UDim.new(0, 10)
-uicorner_756.Parent = textbutton_849
-local uistroke_693 = Instance.new("UIStroke")
-uistroke_693.Thickness = 2
-uistroke_693.Color = Color3.fromRGB(100, 150, 255)
-uistroke_693.Parent = textbutton_849
-local textbox_401 = Instance.new("TextBox")
-textbox_401.Size = UDim2.new(0, 60, 0, 50)
-textbox_401.Position = UDim2.new(0.05, 140, 0.8, 0)
-textbox_401.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-textbox_401.TextColor3 = Color3.fromRGB(255, 255, 255)
-textbox_401.PlaceholderText = "25"
-textbox_401.Text = "Sprizan Speed"
-textbox_401.Font = Font.GothamBold
-textbox_401.TextScaled = true
-textbox_401.ClearTextOnFocus = false
-textbox_401.Parent = screengui_147
-local uicorner_518 = Instance.new("UICorner")
-uicorner_518.CornerRadius = UDim.new(0, 10)
-uicorner_518.Parent = textbox_401
-local uistroke_384 = Instance.new("UIStroke")
-uistroke_384.Thickness = 2
-uistroke_384.Color = Color3.fromRGB(70, 70, 70)
-uistroke_384.Parent = textbox_401
-textbutton_849.MouseButton1Click:Connect(function(arg1, arg2, arg3)
-    textbutton_849.Text = "Disable Move"
-    textbutton_849.BackgroundColor3 = Color3.fromRGB(255, 70, 70)
-    uistroke_693.Color = Color3.fromRGB(255, 100, 100)
-    RunService.Heartbeat:Connect(function(arg1, arg2, arg3)
-        local v51 = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-        local v52 = game.Players.LocalPlayer.Character.FindFirstChildOfClass(game.Players.LocalPlayer.Character, "Humanoid")
-        local calc_53 = (Vector3.new(v52.MoveDirection.X, 0, v52.MoveDirection.Z) * arg1)
-        local v54 = v51.Velocity.Lerp(v51.Velocity, Vector3.new(calc_53.X, v51.Velocity.Y, calc_53.Z), 0.45)
-        v51.Velocity = v54
-    end)
+
+--// Button Toggle
+button.MouseButton1Click:Connect(function()
+	enabled = not enabled
+
+	if enabled then
+		button.Text = "Disable Speed"
+		button.BackgroundColor3 = Color3.fromRGB(255,70,70)
+		stroke.Color = Color3.fromRGB(255,120,120)
+		startSpeed()
+	else
+		button.Text = "Enable Speed"
+		button.BackgroundColor3 = Color3.fromRGB(70,120,255)
+		stroke.Color = Color3.fromRGB(120,170,255)
+		stopSpeed()
+	end
 end)
-textbox_401.FocusLost:Connect(function(arg1, arg2)
-    textbox_401.Text = "arg1"
+
+--// Speed Input
+box.FocusLost:Connect(function()
+	local val = tonumber(box.Text)
+	if val then
+		speed = math.clamp(val, 1, 500)
+		box.Text = tostring(speed)
+	else
+		box.Text = tostring(speed)
+	end
 end)
