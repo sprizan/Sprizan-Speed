@@ -1,181 +1,170 @@
---// Services
+-- Services
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local UIS = game:GetService("UserInputService")
-local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+
 local player = Players.LocalPlayer
 
---// Values
-local speed = 60
-local jumpForce = 85
-local speedEnabled = false
-local speedConn
+-- Werte (legit & safe)
+local speed = 20
+local jump = 55
+local enabled = false
 
---// GUI
-local gui = Instance.new("ScreenGui", player.PlayerGui)
-gui.Name = "SprizanBooster"
+-- GUI
+local gui = Instance.new("ScreenGui")
+gui.Name = "SprizanMobileMovement"
 gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
 
-local main = Instance.new("Frame", gui)
-main.Size = UDim2.new(0,300,0,250)
-main.Position = UDim2.new(0.35,0,0.35,0)
-main.BackgroundColor3 = Color3.fromRGB(18,18,22)
+-- Main Frame
+local main = Instance.new("Frame")
+main.Size = UDim2.new(0, 340, 0, 260)
+main.Position = UDim2.new(0.5, -170, 0.6, -130)
+main.BackgroundColor3 = Color3.fromRGB(240,240,240)
 main.BorderSizePixel = 0
-Instance.new("UICorner", main).CornerRadius = UDim.new(0,18)
+main.Parent = gui
+Instance.new("UICorner", main).CornerRadius = UDim.new(0,20)
 
--- Glow
-local stroke = Instance.new("UIStroke", main)
-stroke.Thickness = 2
-stroke.Color = Color3.fromRGB(120,160,255)
-
--- Gradient Animation
-local grad = Instance.new("UIGradient", main)
-grad.Color = ColorSequence.new{
-	ColorSequenceKeypoint.new(0, Color3.fromRGB(90,120,255)),
-	ColorSequenceKeypoint.new(1, Color3.fromRGB(255,90,200))
-}
-TweenService:Create(
-	grad,
-	TweenInfo.new(3, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1),
-	{Rotation = 360}
-):Play()
-
--- Drag (TOP BAR)
+-- Top Bar (Drag)
 local top = Instance.new("Frame", main)
-top.Size = UDim2.new(1,0,0,45)
-top.BackgroundTransparency = 1
+top.Size = UDim2.new(1,0,0,55)
+top.BackgroundColor3 = Color3.fromRGB(230,230,230)
+Instance.new("UICorner", top).CornerRadius = UDim.new(0,20)
 
-local dragging, dragStart, startPos
-top.InputBegan:Connect(function(i)
-	if i.UserInputType == Enum.UserInputType.MouseButton1 then
+-- Drag (Touch + Mouse)
+local dragging = false
+local dragStart, startPos
+
+top.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.Touch
+	or input.UserInputType == Enum.UserInputType.MouseButton1 then
 		dragging = true
-		dragStart = i.Position
+		dragStart = input.Position
 		startPos = main.Position
 	end
 end)
-UIS.InputChanged:Connect(function(i)
-	if dragging and i.UserInputType == Enum.UserInputType.MouseMovement then
-		local d = i.Position - dragStart
-		main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset+d.X, startPos.Y.Scale, startPos.Y.Offset+d.Y)
+
+top.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.Touch
+	or input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = false
 	end
 end)
-UIS.InputEnded:Connect(function(i)
-	if i.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
+
+UserInputService.InputChanged:Connect(function(input)
+	if dragging and (
+		input.UserInputType == Enum.UserInputType.Touch
+		or input.UserInputType == Enum.UserInputType.MouseMovement
+	) then
+		local delta = input.Position - dragStart
+		main.Position = UDim2.new(
+			startPos.X.Scale,
+			startPos.X.Offset + delta.X,
+			startPos.Y.Scale,
+			startPos.Y.Offset + delta.Y
+		)
+	end
 end)
 
 -- Title
 local title = Instance.new("TextLabel", top)
-title.Size = UDim2.new(1,0,0,30)
+title.Size = UDim2.new(1,0,1,0)
 title.BackgroundTransparency = 1
-title.Text = "Sprizan Booster"
+title.Text = "Movement Settings"
 title.Font = Enum.Font.GothamBold
 title.TextScaled = true
-title.TextColor3 = Color3.fromRGB(160,190,255)
+title.TextColor3 = Color3.fromRGB(40,40,40)
 
-local dc = Instance.new("TextLabel", top)
-dc.Position = UDim2.new(0,0,0,28)
-dc.Size = UDim2.new(1,0,0,16)
-dc.BackgroundTransparency = 1
-dc.Text = "discord.gg/DAA3d7BcPU"
-dc.Font = Enum.Font.Gotham
-dc.TextScaled = true
-dc.TextColor3 = Color3.fromRGB(180,180,180)
+-- Toggle Button (groß)
+local toggle = Instance.new("TextButton", main)
+toggle.Size = UDim2.new(0.9,0,0,60)
+toggle.Position = UDim2.new(0.05,0,0.3,0)
+toggle.Text = "Enable Movement Boost"
+toggle.Font = Enum.Font.GothamBold
+toggle.TextScaled = true
+toggle.TextColor3 = Color3.new(1,1,1)
+toggle.BackgroundColor3 = Color3.fromRGB(90,170,120)
+Instance.new("UICorner", toggle).CornerRadius = UDim.new(0,14)
 
--- Sound
+-- Speed Box
+local speedBox = Instance.new("TextBox", main)
+speedBox.Size = UDim2.new(0.4,0,0,50)
+speedBox.Position = UDim2.new(0.05,0,0.6,0)
+speedBox.Text = tostring(speed)
+speedBox.PlaceholderText = "Speed"
+speedBox.ClearTextOnFocus = false
+speedBox.Font = Enum.Font.GothamBold
+speedBox.TextScaled = true
+speedBox.TextColor3 = Color3.fromRGB(30,30,30)
+speedBox.BackgroundColor3 = Color3.fromRGB(255,255,255)
+Instance.new("UICorner", speedBox).CornerRadius = UDim.new(0,12)
+
+-- Jump Box
+local jumpBox = Instance.new("TextBox", main)
+jumpBox.Size = UDim2.new(0.4,0,0,50)
+jumpBox.Position = UDim2.new(0.55,0,0.6,0)
+jumpBox.Text = tostring(jump)
+jumpBox.PlaceholderText = "Jump"
+jumpBox.ClearTextOnFocus = false
+jumpBox.Font = Enum.Font.GothamBold
+jumpBox.TextScaled = true
+jumpBox.TextColor3 = Color3.fromRGB(30,30,30)
+jumpBox.BackgroundColor3 = Color3.fromRGB(255,255,255)
+Instance.new("UICorner", jumpBox).CornerRadius = UDim.new(0,12)
+
+-- Dezenter Sound
 local sound = Instance.new("Sound", gui)
-sound.SoundId = "rbxassetid://9118823101"
-sound.Volume = 1
+sound.SoundId = "rbxassetid://12221967"
+sound.Volume = 0.5
 
--- Speed Button
-local btn = Instance.new("TextButton", main)
-btn.Size = UDim2.new(0.8,0,0,45)
-btn.Position = UDim2.new(0.1,0,0.35,0)
-btn.Text = "ENABLE BOOST"
-btn.Font = Enum.Font.GothamBold
-btn.TextScaled = true
-btn.TextColor3 = Color3.new(1,1,1)
-btn.BackgroundColor3 = Color3.fromRGB(80,120,255)
-Instance.new("UICorner", btn).CornerRadius = UDim.new(0,14)
-
--- Boxes
-local sBox = Instance.new("TextBox", main)
-sBox.Size = UDim2.new(0.35,0,0,38)
-sBox.Position = UDim2.new(0.1,0,0.6,0)
-sBox.Text = speed
-sBox.Font = Enum.Font.GothamBold
-sBox.TextScaled = true
-sBox.TextColor3 = Color3.new(1,1,1)
-sBox.BackgroundColor3 = Color3.fromRGB(30,30,35)
-Instance.new("UICorner", sBox).CornerRadius = UDim.new(0,10)
-
-local jBox = Instance.new("TextBox", main)
-jBox.Size = UDim2.new(0.35,0,0,38)
-jBox.Position = UDim2.new(0.55,0,0.6,0)
-jBox.Text = jumpForce
-jBox.Font = Enum.Font.GothamBold
-jBox.TextScaled = true
-jBox.TextColor3 = Color3.new(1,1,1)
-jBox.BackgroundColor3 = Color3.fromRGB(30,30,35)
-Instance.new("UICorner", jBox).CornerRadius = UDim.new(0,10)
-
--- Speed Logic
-local function startSpeed()
-	if speedConn then speedConn:Disconnect() end
-	speedConn = RunService.Heartbeat:Connect(function()
-		local c = player.Character
-		local hrp = c and c:FindFirstChild("HumanoidRootPart")
-		local hum = c and c:FindFirstChildOfClass("Humanoid")
-		if hrp and hum then
-			local d = hum.MoveDirection
-			if d.Magnitude > 0 then
-				hrp.AssemblyLinearVelocity = Vector3.new(d.X*speed, hrp.AssemblyLinearVelocity.Y, d.Z*speed)
-			end
+-- Apply
+local function apply()
+	local char = player.Character
+	local hum = char and char:FindFirstChildOfClass("Humanoid")
+	if hum then
+		if enabled then
+			hum.WalkSpeed = speed
+			hum.JumpPower = jump
+		else
+			hum.WalkSpeed = 16
+			hum.JumpPower = 50
 		end
-	end)
+	end
 end
 
--- Hard Jump Bypass
-UIS.JumpRequest:Connect(function()
-	if not speedEnabled then return end
-	local c = player.Character
-	local hrp = c and c:FindFirstChild("HumanoidRootPart")
-	if hrp then
-		local bv = Instance.new("BodyVelocity", hrp)
-		bv.MaxForce = Vector3.new(0, math.huge, 0)
-		bv.Velocity = Vector3.new(0, jumpForce, 0)
-		game.Debris:AddItem(bv, 0.25)
-	end
-end)
-
 -- Toggle
-btn.MouseButton1Click:Connect(function()
-	speedEnabled = not speedEnabled
+toggle.MouseButton1Click:Connect(function()
+	enabled = not enabled
 	sound:Play()
-	if speedEnabled then
-		btn.Text = "DISABLE BOOST"
-		btn.BackgroundColor3 = Color3.fromRGB(255,80,80)
-		startSpeed()
+
+	if enabled then
+		toggle.Text = "Disable Movement Boost"
+		toggle.BackgroundColor3 = Color3.fromRGB(200,90,90)
 	else
-		btn.Text = "ENABLE BOOST"
-		btn.BackgroundColor3 = Color3.fromRGB(80,120,255)
-		if speedConn then speedConn:Disconnect() end
+		toggle.Text = "Enable Movement Boost"
+		toggle.BackgroundColor3 = Color3.fromRGB(90,170,120)
 	end
+
+	apply()
 end)
 
-sBox.FocusLost:Connect(function()
-	local v = tonumber(sBox.Text)
-	if v then speed = math.clamp(v,1,500) end
-	sBox.Text = speed
+-- Inputs
+speedBox.FocusLost:Connect(function()
+	local v = tonumber(speedBox.Text)
+	if v then speed = math.clamp(v,16,30) end
+	speedBox.Text = speed
+	apply()
 end)
 
-jBox.FocusLost:Connect(function()
-	local v = tonumber(jBox.Text)
-	if v then jumpForce = math.clamp(v,1,300) end
-	jBox.Text = jumpForce
+jumpBox.FocusLost:Connect(function()
+	local v = tonumber(jumpBox.Text)
+	if v then jump = math.clamp(v,50,70) end
+	jumpBox.Text = jump
+	apply()
 end)
 
--- Auto reapply
+-- Respawn safe
 player.CharacterAdded:Connect(function()
-	if speedEnabled then task.wait(0.5) startSpeed() end
+	task.wait(0.5)
+	apply()
 end)
 
