@@ -186,18 +186,19 @@ end)
 -- Speed Logic
 local function startSpeed()
 	if speedConn then speedConn:Disconnect() end
-	speedConn = RunService.Heartbeat:Connect(function()
-		local c = player.Character
-		local hrp = c and c:FindFirstChild("HumanoidRootPart")
-		local hum = c and c:FindFirstChildOfClass("Humanoid")
-		if hrp and hum then
-			local d = hum.MoveDirection
-			if d.Magnitude > 0 then
-				hrp.AssemblyLinearVelocity = Vector3.new(d.X*speed, hrp.AssemblyLinearVelocity.Y, d.Z*speed)
-			end
+
+	speedConn = RunService.RenderStepped:Connect(function()
+		if not speedEnabled then return end
+
+		local char = player.Character
+		local hum = char and char:FindFirstChildOfClass("Humanoid")
+
+		if hum then
+			hum.WalkSpeed = speed
 		end
 	end)
 end
+
 
 -- Hard Jump Bypass
 UIS.JumpRequest:Connect(function()
@@ -221,11 +222,20 @@ btn.MouseButton1Click:Connect(function()
 		btn.BackgroundColor3 = Color3.fromRGB(255,80,80)
 		startSpeed()
 	else
-		btn.Text = "ENABLE BOOST"
-		btn.BackgroundColor3 = Color3.fromRGB(80,120,255)
-		if speedConn then speedConn:Disconnect() end
+	btn.Text = "ENABLE BOOST"
+	btn.BackgroundColor3 = Color3.fromRGB(80,120,255)
+
+	if speedConn then 
+		speedConn:Disconnect() 
 	end
-end)
+
+	local char = player.Character
+	local hum = char and char:FindFirstChildOfClass("Humanoid")
+	if hum then
+		hum.WalkSpeed = 16
+	end
+end
+
 
 sBox.FocusLost:Connect(function()
 	local v = tonumber(sBox.Text)
