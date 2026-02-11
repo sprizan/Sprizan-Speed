@@ -10,6 +10,10 @@ local speed = 60
 local jumpForce = 85
 local speedEnabled = false
 local speedConn
+local sound = Instance.new("Sound")
+sound.SoundId = "rbxassetid://9118823105" -- example sound
+sound.Volume = 1
+sound.Parent = gui
 
 --// GUI
 local gui = Instance.new("ScreenGui", player.PlayerGui)
@@ -216,25 +220,27 @@ end)
 -- Toggle
 btn.MouseButton1Click:Connect(function()
 	speedEnabled = not speedEnabled
-	sound:Play()
+
 	if speedEnabled then
 		btn.Text = "DISABLE BOOST"
 		btn.BackgroundColor3 = Color3.fromRGB(255,80,80)
 		startSpeed()
 	else
-	btn.Text = "ENABLE BOOST"
-	btn.BackgroundColor3 = Color3.fromRGB(80,120,255)
+		btn.Text = "ENABLE BOOST"
+		btn.BackgroundColor3 = Color3.fromRGB(80,120,255)
 
-	if speedConn then 
-		speedConn:Disconnect() 
-	end
+		if speedConn then 
+			speedConn:Disconnect() 
+		end
 
-	local char = player.Character
-	local hum = char and char:FindFirstChildOfClass("Humanoid")
-	if hum then
-		hum.WalkSpeed = 16
+		local char = player.Character
+		local hum = char and char:FindFirstChildOfClass("Humanoid")
+		if hum then
+			hum.WalkSpeed = 16
+		end
 	end
-end
+end)
+
 
 
 sBox.FocusLost:Connect(function()
