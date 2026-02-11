@@ -248,7 +248,7 @@ end)
 local openBtn = Instance.new("TextButton", gui)
 openBtn.Size = UDim2.new(0,130,0,45)
 openBtn.Position = UDim2.new(0,20,0.5,0)
-openBtn.Text = "Open Booster"
+openBtn.Text = "Sprizan Booster"
 openBtn.Font = Enum.Font.GothamBold
 openBtn.TextScaled = true
 openBtn.TextColor3 = Color3.new(1,1,1)
