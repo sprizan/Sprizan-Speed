@@ -98,6 +98,21 @@ dc.Font = Enum.Font.Gotham
 dc.TextScaled = true
 dc.TextColor3 = Color3.fromRGB(160,160,160)
 
+-- CLOSE BUTTON (X)
+local closeBtn = Instance.new("TextButton", top)
+closeBtn.Size = UDim2.new(0,30,0,30)
+closeBtn.Position = UDim2.new(1,-35,0,7)
+closeBtn.Text = "X"
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextScaled = true
+closeBtn.TextColor3 = Color3.new(1,1,1)
+closeBtn.BackgroundColor3 = Color3.fromRGB(200,60,60)
+Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(1,0)
+
+closeBtn.MouseButton1Click:Connect(function()
+	main.Visible = false
+end)
+
 -- SPEED LABEL
 local speedLabel = Instance.new("TextLabel", main)
 speedLabel.Position = UDim2.new(0.1,0,0.35,0)
@@ -227,4 +242,19 @@ end)
 -- Auto reapply
 player.CharacterAdded:Connect(function()
 	if speedEnabled then task.wait(0.5) startSpeed() end
+end)
+
+-- OPEN BUTTON (unten links)
+local openBtn = Instance.new("TextButton", gui)
+openBtn.Size = UDim2.new(0,130,0,45)
+openBtn.Position = UDim2.new(0,20,0.5,0)
+openBtn.Text = "Open Booster"
+openBtn.Font = Enum.Font.GothamBold
+openBtn.TextScaled = true
+openBtn.TextColor3 = Color3.new(1,1,1)
+openBtn.BackgroundColor3 = Color3.fromRGB(80,120,255)
+Instance.new("UICorner", openBtn).CornerRadius = UDim.new(0,15)
+
+openBtn.MouseButton1Click:Connect(function()
+	main.Visible = true
 end)
